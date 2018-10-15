@@ -1,0 +1,171 @@
+import os
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+np.set_printoptions(threshold=np.nan)
+
+#Load image và convert sang image gray
+im = cv2.imread("bxx2.jpg")
+im_gray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
+# lọc nhiễu bằng bilateralFilter mục đích lọc này là làm tăng strengt cho edge trên image
+noise_removal = cv2.bilateralFilter(im_gray,9,75,75)
+# Cân bằng lại histogram của ảnh 
+equal_histogram = cv2.equalizeHist(noise_removal)
+#  Morphogoly open mục đích là làm tăng dilation của edge và giảm edge nhiễu
+kernel1 = cv2.getStructuringElement(cv2.MORPH_RECT,(5,5))
+morph_image = cv2.morphologyEx(equal_histogram,cv2.MORPH_OPEN,kernel1,iterations=20)
+# subtract image
+sub_morp_image = cv2.subtract(equal_histogram,morph_image)
+# dùng threshold OSTU
+ret,thresh_image = cv2.threshold(sub_morp_image,0,255,cv2.THRESH_OTSU)
+# Dùng canny
+canny_image = cv2.Canny(thresh_image,250,255)
+# dilation
+kernel2= np.ones((3,3), np.uint8)
+dilated_image = cv2.dilate(canny_image,kernel2)
+#
+new,contours, hierarchy = cv2.findContours(dilated_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+print(np.size(contours))
+
+# cv2.drawContours(dilated_image,contours,-1,(0,255,0),1)
+# cv2.imshow("asdf",dilated_image)
+# cv2.waitKey(0)
+contours= sorted(contours, key = cv2.contourArea, reverse = True)[:10]
+# print(np.size(contourss))
+# print(np.shape(contourss))
+# print(type(contourss))
+# contour1=contourss[1]
+# print(contour1)
+# cv2.drawContours(im,contours,-1,(255,0,0))
+# cv2.imshow("asdf",im)
+# cv2.waitKey(0)
+# screenCnt = None
+# cv2.imshow("dilated_image",dilated_image)
+for c in contours:
+    # print("New contour")
+    # print (c)
+    # print("\n")
+    peri = cv2.arcLength(c, True)
+    approx = cv2.approxPolyDP(c, 0.06 * peri, True) 
+    if len(approx) == 4:
+            screenCnt = approx
+            break
+#final = cv2.drawContours(im, [screenCnt], -1, (0, 255, 0), 3)
+
+###
+# plt.subplots(figsize=(20,20))
+# plt.subplot(1,4,1)
+# plt.imshow(cv2.cvtColor(im,cv2.COLOR_BGR2RGB))
+# plt.title("image")
+# plt.axis('off')
+# plt.subplot(1,4,2)
+# plt.imshow(im_gray,cmap="gray")
+# plt.title("im_gray")
+# plt.axis('off')
+# plt.subplot(1,4,3)
+# plt.imshow(noise_removal,cmap="gray")
+# plt.title("noise_removal")
+# plt.axis('off')
+# plt.subplot(1,4,4)
+# plt.imshow(morph_image,cmap="gray")
+# plt.title("morph_image")
+# plt.axis('off')
+# plt.subplots(figsize=(20,20))
+# plt.subplot(1,4,1)
+# plt.imshow(sub_morp_image,cmap="gray")
+# plt.title("sub_morp_image")
+# plt.axis('off')
+# plt.subplot(1,4,2)
+# plt.imshow(thresh_image,cmap="gray")
+# plt.title("thresh_image")
+# plt.axis('off')
+# plt.subplot(1,4,3)
+# plt.imshow(canny_image,cmap="gray")
+# plt.title("canny_image")
+# plt.axis('off')
+# plt.subplot(1,4,4)
+# plt.imshow(dilated_image,cmap="gray")
+# plt.title("dilated_image")
+# plt.axis('off')
+###
+# cv2.namedWindow('im',cv2.WINDOW_NORMAL)
+# cv2.imshow("im",im)
+# cv2.imshow("im_gray",im_gray)
+# cv2.imshow("noise_removal",noise_removal)
+# cv2.imshow("morph_image",morph_image)
+# cv2.imshow("sub_morp_image",sub_morp_image)
+# cv2.imshow("thresh_image",thresh_image)
+# cv2.imshow("canny_image",canny_image)
+# cv2.imshow("dilated_image",dilated_image)
+# cv2.waitKey()
+# cv2.destroyAllWindows()
+# cv2.imshow("im",im)
+# cv2.waitKey()
+# cv2.destroyAllWindows()
+###
+(x,y,w,h) = cv2.boundingRect(screenCnt)
+roi = im[y:y+h,x:x+w]
+cv2.imshow("roi",roi)
+roi1 = roi.copy()
+###
+# plt.subplots(figsize=(20,20))
+# plt.subplot(1,2,1)
+# plt.imshow(cv2.cvtColor(im,cv2.COLOR_BGR2RGB))
+# plt.title("image")
+# plt.axis('off')
+# plt.subplot(1,2,2)
+# plt.imshow(roi,cmap="gray")
+# plt.title("plate")
+# plt.axis('off')
+###
+plt.imshow(cv2.cvtColor(roi,cv2.COLOR_BGR2RGB))
+roi_gray = cv2.cvtColor(roi,cv2.COLOR_BGR2GRAY)
+roi_blur = cv2.GaussianBlur(roi_gray,(3,3),1)
+ret,thre = cv2.threshold(roi_blur,120,255,cv2.THRESH_BINARY_INV)
+#cany = cv2.Canny(thre,250,255)
+kerel3 = cv2.getStructuringElement(cv2.MORPH_RECT,(3,3))
+thre_mor = cv2.morphologyEx(thre,cv2.MORPH_DILATE,kerel3)
+##
+# cv2.imshow("im1",roi)
+# cv2.imshow("im3",thre_mor)
+# cv2.imshow("im2",roi1)
+# cv2.waitKey()
+# cv2.destroyAllWindows()
+##
+_,cont,hier = cv2.findContours(thre_mor,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
+dr = cv2.drawContours(roi1,cont,-1,(0,255,0))
+# cv2.imshow("roi1",roi1) ## Split Plate + contour all 
+# cv2.waitKey()
+#
+print("cont: ")
+print(len(cont))
+print(type(cont))
+print(np.shape(cont))
+print(cont[0])
+cv2.drawContours(roi1,cont,-1,(255,0,0),1)
+cv2.namedWindow('image',cv2.WINDOW_NORMAL)
+cv2.resizeWindow('image', 600,600)
+cv2.imshow("image",roi1)
+cv2.waitKey()
+areas_ind = {}
+areas = []
+for ind,cnt in enumerate(cont):
+    area = cv2.contourArea(cnt)
+    areas_ind[area] = ind
+    areas.append(area)
+#print(cont)
+print("areas_ind: ", areas_ind)
+areas = sorted(areas,reverse=True)[2:9]
+print("areas: ", areas)
+#print(areas_ind[areas])
+cnt = sorted(areas_ind,key=lambda key: areas,reverse=True)
+print("cnt: ", cnt )
+print("Areas_ind[1]:", areas_ind[51])
+
+for i in areas:
+    print(areas_ind[i])
+    (x,y,w,h) = cv2.boundingRect(cont[areas_ind[i]])
+    cv2.rectangle(roi,(x,y),(x+w,y+h),(0,255,0),1)
+plt.imshow(cv2.cvtColor(roi,cv2.COLOR_BGR2RGB))
+cv2.imshow("roi",roi)
+cv2.waitKey(0)
