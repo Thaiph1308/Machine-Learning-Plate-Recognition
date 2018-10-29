@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 np.set_printoptions(threshold=np.nan)
 
 #Load image và convert sang image gray
-im = cv2.imread("bxx2.jpg")
+im = cv2.imread("bxx5.jpg")
 im_gray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
 # lọc nhiễu bằng bilateralFilter mục đích lọc này là làm tăng strengt cho edge trên image
 noise_removal = cv2.bilateralFilter(im_gray,9,75,75)
@@ -104,8 +104,8 @@ for c in contours:
 # cv2.destroyAllWindows()
 ###
 (x,y,w,h) = cv2.boundingRect(screenCnt)
-roi = im[y:y+h,x:x+w]
-cv2.imshow("roi",roi)
+roi = im[y:y+h+30,x:x+w+30]
+#cv2.imshow("roi",roi)
 roi1 = roi.copy()
 ###
 # plt.subplots(figsize=(20,20))
@@ -137,35 +137,51 @@ dr = cv2.drawContours(roi1,cont,-1,(0,255,0))
 # cv2.imshow("roi1",roi1) ## Split Plate + contour all 
 # cv2.waitKey()
 #
-print("cont: ")
-print(len(cont))
+print("cont: ",len(cont))
 print(type(cont))
 print(np.shape(cont))
 print(cont[0])
-cv2.drawContours(roi1,cont,-1,(255,0,0),1)
-cv2.namedWindow('image',cv2.WINDOW_NORMAL)
-cv2.resizeWindow('image', 600,600)
-cv2.imshow("image",roi1)
-cv2.waitKey()
+# cv2.drawContours(roi1,cont,-1,(255,0,0),1)
+# cv2.namedWindow('image',cv2.WINDOW_NORMAL)
+# cv2.resizeWindow('image', 600,600)
+# cv2.imshow("image",roi1)
+# cv2.waitKey()
 areas_ind = {}
 areas = []
 for ind,cnt in enumerate(cont):
     area = cv2.contourArea(cnt)
-    areas_ind[area] = ind
+    areas_ind[ind] = area
     areas.append(area)
 #print(cont)
+print(len(areas_ind))
 print("areas_ind: ", areas_ind)
-areas = sorted(areas,reverse=True)[2:9]
+areas = sorted(areas,reverse=True)
+print("areas roi: ", areas)
+areas = sorted(areas,reverse=True)[1:11]
 print("areas: ", areas)
-#print(areas_ind[areas])
-cnt = sorted(areas_ind,key=lambda key: areas,reverse=True)
-print("cnt: ", cnt )
-print("Areas_ind[1]:", areas_ind[51])
-
-for i in areas:
-    print(areas_ind[i])
-    (x,y,w,h) = cv2.boundingRect(cont[areas_ind[i]])
+# #print(areas_ind[areas])
+# cnt = sorted(areas_ind,key=lambda key: areas,reverse=True)
+# print("cnt: ", cnt )
+# print("Areas_ind[1]:", areas_ind[51])
+new_cont=[]
+for i,area in enumerate(areas):
+    #print(list(areas_ind.keys())[list(areas_ind.values()).index(area)],"index: ", i , "area: ", area)  
+    new_cont.append(cont[list(areas_ind.keys())[list(areas_ind.values()).index(area)]])
+    (x,y,w,h) = cv2.boundingRect(cont[list(areas_ind.keys())[list(areas_ind.values()).index(area)]])
     cv2.rectangle(roi,(x,y),(x+w,y+h),(0,255,0),1)
+#print(cont[list(areas_ind.keys())[list(areas_ind.values()).index(2)]])
+#cv2.drawContours(roi,cont[list(areas_ind.keys())[list(areas_ind.values()).index(2)]],-1,(0,255,0),1)
+#print(new_cont)
+#print(new_cont)
+# print(type(new_cont))
+# print(len(new_cont))
+# print(np.shape(new_cont))
 plt.imshow(cv2.cvtColor(roi,cv2.COLOR_BGR2RGB))
-cv2.imshow("roi",roi)
-cv2.waitKey(0)
+cv2.namedWindow('image1111',cv2.WINDOW_NORMAL)
+cv2.resizeWindow('image1111', 700,700)
+#dr = cv2.drawContours(roi,new_cont,-1,(0,255,0))
+cv2.imshow("image1111",roi)
+#cv2.imshow("image1111",roi1)
+cv2.waitKey()
+
+# cv2.destroyAllWindowim
