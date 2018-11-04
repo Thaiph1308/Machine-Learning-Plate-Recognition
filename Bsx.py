@@ -2,7 +2,16 @@ import os
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
+
 np.set_printoptions(threshold=np.nan)
+
+def sub_plot(characters,row,column):
+    plt.subplots(figsize=(10,10))
+    for i,character in enumerate(characters):
+        plt.subplot(row,column,i+1)
+        plt.imshow(character)
+    plt.show()
+
 
 #Load image và convert sang image gray
 im = cv2.imread("bxx5.jpg")
@@ -27,20 +36,8 @@ dilated_image = cv2.dilate(canny_image,kernel2)
 new,contours, hierarchy = cv2.findContours(dilated_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 print(np.size(contours))
 
-# cv2.drawContours(dilated_image,contours,-1,(0,255,0),1)
-# cv2.imshow("asdf",dilated_image)
-# cv2.waitKey(0)
 contours= sorted(contours, key = cv2.contourArea, reverse = True)[:10]
-# print(np.size(contourss))
-# print(np.shape(contourss))
-# print(type(contourss))
-# contour1=contourss[1]
-# print(contour1)
-# cv2.drawContours(im,contours,-1,(255,0,0))
-# cv2.imshow("asdf",im)
-# cv2.waitKey(0)
-# screenCnt = None
-# cv2.imshow("dilated_image",dilated_image)
+
 for c in contours:
     # print("New contour")
     # print (c)
@@ -88,38 +85,16 @@ for c in contours:
 # plt.title("dilated_image")
 # plt.axis('off')
 ###
-# cv2.namedWindow('im',cv2.WINDOW_NORMAL)
-# cv2.imshow("im",im)
-# cv2.imshow("im_gray",im_gray)
-# cv2.imshow("noise_removal",noise_removal)
-# cv2.imshow("morph_image",morph_image)
-# cv2.imshow("sub_morp_image",sub_morp_image)
-# cv2.imshow("thresh_image",thresh_image)
-# cv2.imshow("canny_image",canny_image)
-# cv2.imshow("dilated_image",dilated_image)
-# cv2.waitKey()
-# cv2.destroyAllWindows()
-# cv2.imshow("im",im)
-# cv2.waitKey()
-# cv2.destroyAllWindows()
-###
 (x,y,w,h) = cv2.boundingRect(screenCnt)
 roi = im[y:y+h+30,x:x+w+30]
-#cv2.imshow("roi",roi)
-roi1 = roi.copy()
-cv2.imwrite("test.jpg",roi1)
-###
-# plt.subplots(figsize=(20,20))
-# plt.subplot(1,2,1)
-# plt.imshow(cv2.cvtColor(im,cv2.COLOR_BGR2RGB))
-# plt.title("image")
-# plt.axis('off')
-# plt.subplot(1,2,2)
-# plt.imshow(roi,cmap="gray")
-# plt.title("plate")
-# plt.axis('off')
-###
-# plt.imshow(cv2.cvtColor(roi,cv2.COLOR_BGR2RGB))
+# cv2.imshow("roi",roi)
+# cv2.waitKey()
+###Extract Bien so
+
+biensoxe = roi.copy()
+
+################
+cv2.imwrite("test.jpg",biensoxe)
 roi_gray = cv2.cvtColor(roi,cv2.COLOR_BGR2GRAY)
 roi_blur = cv2.GaussianBlur(roi_gray,(3,3),1)
 ret,thre = cv2.threshold(roi_blur,120,255,cv2.THRESH_BINARY_INV)
@@ -134,7 +109,7 @@ thre_mor = cv2.morphologyEx(thre,cv2.MORPH_DILATE,kerel3)
 # cv2.destroyAllWindows()
 ##
 _,cont,hier = cv2.findContours(thre_mor,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
-dr = cv2.drawContours(roi1,cont,-1,(0,255,0))
+dr = cv2.drawContours(biensoxe,cont,-1,(0,255,0))
 # cv2.imshow("roi1",roi1) ## Split Plate + contour all 
 # cv2.waitKey()
 #
@@ -142,11 +117,12 @@ print("cont: ",len(cont))
 print(type(cont))
 print(np.shape(cont))
 print(cont[0])
-# cv2.drawContours(roi1,cont,-1,(255,0,0),1)
+# cv2.drawContours(biensoxe,cont,-1,(255,0,0),1)
 # cv2.namedWindow('image',cv2.WINDOW_NORMAL)
 # cv2.resizeWindow('image', 600,600)
-# cv2.imshow("image",roi1)
+# cv2.imshow("image",biensoxe)
 # cv2.waitKey()
+
 areas_ind = {}
 areas = []
 for ind,cnt in enumerate(cont):
@@ -164,18 +140,22 @@ print("areas: ", areas)
 # cnt = sorted(areas_ind,key=lambda key: areas,reverse=True)
 # print("cnt: ", cnt )
 # print("Areas_ind[1]:", areas_ind[51])
+
 new_cont=[]
 for i,area in enumerate(areas):
     #print(list(areas_ind.keys())[list(areas_ind.values()).index(area)],"index: ", i , "area: ", area)  
     new_cont.append(cont[list(areas_ind.keys())[list(areas_ind.values()).index(area)]])
     (x,y,w,h) = cv2.boundingRect(cont[list(areas_ind.keys())[list(areas_ind.values()).index(area)]])
     cv2.rectangle(roi,(x,y),(x+w,y+h),(0,255,0),1)
+cv2.imshow("ewqr",roi)
+cv2.waitKey()
+
 character = []
 for area in areas:
     (x,y,w,h) = cv2.boundingRect(cont[list(areas_ind.keys())[list(areas_ind.values()).index(area)]])
     image = roi[y:y+h,x:x+w]
     character.append(cv2.cvtColor(image,cv2.COLOR_BGR2RGB))
-print(roi)
+print(np.shape(roi))
 print(len(roi))
 print(type(roi))
 #print(cont[list(areas_ind.keys())[list(areas_ind.values()).index(2)]])
@@ -188,30 +168,9 @@ print(type(roi))
 # plt.imshow(cv2.cvtColor(roi,cv2.COLOR_BGR2RGB))
 # cv2.namedWindow('image1111',cv2.WINDOW_NORMAL)
 # cv2.resizeWindow('image1111', 700,700)
-# cv2.imshow("image1111",roi1)
+# cv2.imshow("image1111",biensoxe)
 #dr = cv2.drawContours(roi,new_cont,-1,(0,255,0))
 # cv2.imshow("image1111",roi)
 # cv2.waitKey()
-plt.subplots(figsize=(5,5))
-plt.subplot(1,10,1)
-plt.imshow(character[0])
-plt.subplot(1,10,2)
-plt.imshow(character[1])
-plt.subplot(1,10,3)
-plt.imshow(character[2])
-plt.subplot(1,10,4)
-plt.imshow(character[3])
-plt.subplot(1,10,5)
-plt.imshow(character[4])
-plt.subplot(1,10,6)
-plt.imshow(character[5])
-plt.subplot(1,10,7)
-plt.imshow(character[6])
-plt.subplot(1,10,8)
-plt.imshow(character[7])
-plt.subplot(1,10,9)
-plt.imshow(character[8])
-plt.subplot(1,10,10)
-plt.imshow(character[9])
-plt.show()
-# cv2.destroyAllWindowim
+
+sub_plot(character,1,10)
