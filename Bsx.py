@@ -167,8 +167,9 @@ for box in boundingBox:
     character.append(cv2.cvtColor(image,cv2.COLOR_BGR2RGB))
 #Util.sub_plot(character,1,10)
 Util.print_info(character[2],'true')
+cv2.imwrite("testsvm.jpg",biensoxe)
 #pred=model.predict(character[1])
-print("PREDICT: ", pred)
+#print("PREDICT: ", pred)
 # Util.draw_contour(roi,conts[1],0)
 # (x,y,w,h) = boundingBox[1]
 # cv2.rectangle(roi,(x,y),(x+w,y+h),(0,255,0),1)
