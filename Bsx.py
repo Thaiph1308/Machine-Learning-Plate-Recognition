@@ -2,16 +2,9 @@ import os
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
+import Util
 
-np.set_printoptions(threshold=np.nan)
-
-def sub_plot(characters,row,column):
-    plt.subplots(figsize=(10,10))
-    for i,character in enumerate(characters):
-        plt.subplot(row,column,i+1)
-        plt.imshow(character)
-    plt.show()
-
+#np.set_printoptions(threshold=np.nan)
 
 #Load image và convert sang image gray
 im = cv2.imread("bxx5.jpg")
@@ -125,11 +118,21 @@ print(cont[0])
 
 areas_ind = {}
 areas = []
+boundingRect = []
+
 for ind,cnt in enumerate(cont):
     area = cv2.contourArea(cnt)
+    # x= cv2.boundingRect(cnt)
+    # #print_info(x,'true')
+    # boundingRect.append(x)
     areas_ind[ind] = area
     areas.append(area)
-#print(cont)
+# boundingRect=np.asarray(boundingRect)
+# Util.print_info(boundingRect,'true')
+# #print("Bdr: ", boundingRect)
+# print(boundingRect[0])
+# print(boundingRect[0][1])
+
 print(len(areas_ind))
 print("areas_ind: ", areas_ind)
 areas = sorted(areas,reverse=True)
@@ -146,18 +149,33 @@ for i,area in enumerate(areas):
     #print(list(areas_ind.keys())[list(areas_ind.values()).index(area)],"index: ", i , "area: ", area)  
     new_cont.append(cont[list(areas_ind.keys())[list(areas_ind.values()).index(area)]])
     (x,y,w,h) = cv2.boundingRect(cont[list(areas_ind.keys())[list(areas_ind.values()).index(area)]])
-    cv2.rectangle(roi,(x,y),(x+w,y+h),(0,255,0),1)
-cv2.imshow("ewqr",roi)
-cv2.waitKey()
+    #cv2.rectangle(roi,(x,y),(x+w,y+h),(0,255,0),1)
+#cv2.imshow("ewqr",roi)
+#cv2.waitKey()
 
+Util.print_info(new_cont)
+(conts, boundingBox)=Util.sort_contours(new_cont)
+Util.print_info(boundingBox,'true')
+# for (i,c) in enumerate(conts):
+#     Util.draw_contour(roi,c,i)
 character = []
-for area in areas:
-    (x,y,w,h) = cv2.boundingRect(cont[list(areas_ind.keys())[list(areas_ind.values()).index(area)]])
+for box in boundingBox:
+    (x,y,w,h) = box
     image = roi[y:y+h,x:x+w]
     character.append(cv2.cvtColor(image,cv2.COLOR_BGR2RGB))
-print(np.shape(roi))
-print(len(roi))
-print(type(roi))
+#Util.sub_plot(character,1,10)
+Util.print_info(character[2],'true')
+# Util.draw_contour(roi,conts[1],0)
+# (x,y,w,h) = boundingBox[1]
+# cv2.rectangle(roi,(x,y),(x+w,y+h),(0,255,0),1)
+#cv2.imshow("Sorted", roi)
+#cv2.waitKey(0)
+# character = []
+# for area in areas:
+#     (x,y,w,h) = cv2.boundingRect(cont[list(areas_ind.keys())[list(areas_ind.values()).index(area)]])
+#     image = roi[y:y+h,x:x+w]
+#     character.append(cv2.cvtColor(image,cv2.COLOR_BGR2RGB))
+
 #print(cont[list(areas_ind.keys())[list(areas_ind.values()).index(2)]])
 #cv2.drawContours(roi,cont[list(areas_ind.keys())[list(areas_ind.values()).index(2)]],-1,(0,255,0),1)
 #print(new_cont)
@@ -172,5 +190,4 @@ print(type(roi))
 #dr = cv2.drawContours(roi,new_cont,-1,(0,255,0))
 # cv2.imshow("image1111",roi)
 # cv2.waitKey()
-
-sub_plot(character,1,10)
+# sub_plot(character,1,10)
