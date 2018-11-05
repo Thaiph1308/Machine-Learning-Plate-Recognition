@@ -3,7 +3,9 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import Util
-
+import pickle
+with open('SVM90.pkl', 'rb') as fid:
+    model = pickle.load(fid)
 #np.set_printoptions(threshold=np.nan)
 
 #Load image và convert sang image gray
@@ -165,6 +167,8 @@ for box in boundingBox:
     character.append(cv2.cvtColor(image,cv2.COLOR_BGR2RGB))
 #Util.sub_plot(character,1,10)
 Util.print_info(character[2],'true')
+#pred=model.predict(character[1])
+print("PREDICT: ", pred)
 # Util.draw_contour(roi,conts[1],0)
 # (x,y,w,h) = boundingBox[1]
 # cv2.rectangle(roi,(x,y),(x+w,y+h),(0,255,0),1)

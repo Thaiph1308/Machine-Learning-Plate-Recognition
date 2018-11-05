@@ -3,6 +3,7 @@ import pickle
 import numpy as np
 from skimage.feature import hog
 from keras.models import load_model
+import Util
 with open('SVM90.pkl', 'rb') as fid:
     model = pickle.load(fid)
 
@@ -22,6 +23,7 @@ for i in contours:
     roi = cv2.dilate(roi, (3, 3))    
     # Calculate the HOG features
     roi_hog_fd = hog(roi, orientations=9, pixels_per_cell=(14, 14), cells_per_block=(1, 1),block_norm="L2")
+    Util.print_info(roi_hog_fd,'true')
     nbr = model.predict(np.array([roi_hog_fd], np.float32))
     cv2.putText(image, str(int(nbr[0])), (x, y),cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 255), 1)
     cv2.namedWindow('image1111',cv2.WINDOW_NORMAL)
