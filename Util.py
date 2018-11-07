@@ -58,7 +58,7 @@ def draw_contour(image, c, i):
 def extract_cont_row(contours):
 	h1 =[]
 	h2 =[]
-	(cnts, boundingBoxes) = sort_contours(contours)
+	(cnts, boundingBoxes) = sort_contours(contours,method='top-to-bottom')
 	anchor = boundingBoxes[0][1]+ boundingBoxes[0][3]
 	for i,box in enumerate(boundingBoxes):
 		if box[1] <= anchor:

@@ -9,7 +9,7 @@ with open('SVM90.pkl', 'rb') as fid:
 #np.set_printoptions(threshold=np.nan)
 
 #Load image và convert sang image gray
-im = cv2.imread("bxx3.jpg")
+im = cv2.imread("bxx.jpg")
 im_gray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
 # lọc nhiễu bằng bilateralFilter mục đích lọc này là làm tăng strengt cho edge trên image
 noise_removal = cv2.bilateralFilter(im_gray,9,75,75)
