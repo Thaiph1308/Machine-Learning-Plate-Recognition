@@ -9,7 +9,7 @@ with open('SVM90.pkl', 'rb') as fid:
 #np.set_printoptions(threshold=np.nan)
 
 #Load image và convert sang image gray
-im = cv2.imread("bxx5.jpg")
+im = cv2.imread("bxx3.jpg")
 im_gray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
 # lọc nhiễu bằng bilateralFilter mục đích lọc này là làm tăng strengt cho edge trên image
 noise_removal = cv2.bilateralFilter(im_gray,9,75,75)
@@ -104,7 +104,7 @@ thre_mor = cv2.morphologyEx(thre,cv2.MORPH_DILATE,kerel3)
 # cv2.destroyAllWindows()
 ##
 _,cont,hier = cv2.findContours(thre_mor,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
-dr = cv2.drawContours(biensoxe,cont,-1,(0,255,0))
+#dr = cv2.drawContours(biensoxe,cont,-1,(0,255,0))
 # cv2.imshow("roi1",roi1) ## Split Plate + contour all 
 # cv2.waitKey()
 #

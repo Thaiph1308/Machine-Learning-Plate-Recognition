@@ -36,11 +36,11 @@ def sort_contours(cnts, method="left-to-right"):
 	# construct the list of bounding boxes and sort them from top to
 	# bottom
 	boundingBoxes = [cv2.boundingRect(c) for c in cnts]
-	(cnts, boundingBoxes) = zip(*sorted(zip(cnts, boundingBoxes),
-		key=lambda b:b[1][i], reverse=reverse))
+	(cnts, boundingBoxes) = zip(*sorted(zip(cnts, boundingBoxes),key=lambda b:b[1][i], reverse=reverse))
  
 	# return the list of sorted contours and bounding boxes
 	return (cnts, boundingBoxes)
+	
 def draw_contour(image, c, i):
 	# compute the center of the contour area and draw a circle
 	# representing the center
@@ -54,3 +54,15 @@ def draw_contour(image, c, i):
  
 	# return the image with the contour number drawn on it
 	return image
+
+def extract_cont_row(contours):
+	h1 =[]
+	h2 =[]
+	(cnts, boundingBoxes) = sort_contours(contours)
+	anchor = boundingBoxes[0][1]+ boundingBoxes[0][3]
+	for i,box in enumerate(boundingBoxes):
+		if box[1] <= anchor:
+			h1.append(cnts[i])
+		else:
+			h2.append(cnts[i])
+	return h1+h2
