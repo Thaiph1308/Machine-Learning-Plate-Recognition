@@ -10,12 +10,13 @@ from keras.layers import Dropout
 from keras.layers import Flatten
 from keras.layers.convolutional import Conv2D
 from keras.layers.convolutional import MaxPooling2D
-from keras.preprocessing.image import img_to_array, load_img
+from keras.preprocessing import image
+from pylab import imread,subplot,imshow,show
 import Util
 
 img_width = 28
 img_height = 28
-model = load_model("CNN.h5") 
+model = load_model("CNN2.h5") 
 
 # def init_cnn_with_weight(weightpath):
 #     model=load_model("CNN.h5")
@@ -44,29 +45,51 @@ def extract_contour(image):
 def full_predict(imagepath):
     (image,conts,BoudingBoxes) = extract_contour(imagepath)
     Character=[]
-    for box in BoudingBoxes:
+    for i,box in enumerate(BoudingBoxes):
         (x,y,w,h) = box
         Util.print_info(image)
         img = image[y:y+h,x:x+w]
+        im_gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        im_blur = cv2.GaussianBlur(im_gray,(5,5),0)
+        (thresh, im_bw) = cv2.threshold(im_blur, 128, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+        img_blur_resize=cv2.resize(im_bw,(28,28),interpolation=cv2.INTER_AREA)
+        im_bw=np.pad(img_blur_resize,(20,20),'constant',constant_values=(0,0))
+        cv2.imwrite("c.jpg",im_bw)
+        # plt.imshow(img)
+        # plt.show()
         Character.append(cv2.cvtColor(img,cv2.COLOR_BGR2RGB))
-    print(Character)
+    #print(Character)
     return Character
-
-images = full_predict("testsvm.jpg")
+#mlp_image = imread('c.jpg')
+cv_image=cv2.imread('c.jpg')
+plt.imshow(cv_image)
+plt.show()
+Character_images = full_predict("testsvm.jpg")
 # image: list of character
-Util.print_info(images[0])
-Util.print_info(np.asarray(images))
-Util.print_info(images)
+#Util.print_info(images[0])
+#Util.print_info(np.asarray(images))
+#Util.print_info(images)
 #Util.sub_plot(images,10,1)
+img = image.load_img(path="c.jpg",grayscale=True,target_size=(28,28,1))
+img = image.img_to_array(img)
+print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA:")
+Util.print_info(img)
 List_of_images = []
-for image in images:
+for image in Character_images:
     x=Util.image_reshape_2(image)
     List_of_images.append(x)
 Util.print_info(List_of_images[0])
 #get_model_info(model)
-y=model.predict(np.asarray(List_of_images))
+# plt.imshow(List_of_images[0].squeeze(),aspect="auto")
+# plt.show()
+print(img)
+x =np.expand_dims(img,axis=0)
+print(x)
+y=model.predict(x)
 y_true = np.argmax(y,axis=1)
+print(y)
 print(y_true)
+ 
 #Util.sub_plot(images,10,1)
 # print(np.shape(Util.image_reshape("digit.jpg")))
 # print(model.predict)

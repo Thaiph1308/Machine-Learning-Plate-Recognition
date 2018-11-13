@@ -95,6 +95,8 @@ def image_reshape_2(image,img_height=28,img_width=28):
 	print("NP shape after np reshape",np.shape(arr))
 	#print(arr)
 	arr = img_to_array(arr)
+	# plt.imshow(arr.squeeze(),aspect="auto")
+	# plt.show()
 	print("NP shape after img to array",np.shape(arr))
 	#arr = np.expand_dims(arr,axis=0)
 	#print("NP shape after expand_dims",np.shape(arr))
