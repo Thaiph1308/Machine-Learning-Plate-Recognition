@@ -82,8 +82,9 @@ for c in contours:
 ###
 (x,y,w,h) = cv2.boundingRect(screenCnt)
 roi = im[y:y+h+30,x:x+w+30]
-# cv2.imshow("roi",roi)
-# cv2.waitKey()
+Util.print_info(roi)
+cv2.imshow("roi",roi)
+cv2.waitKey()
 ###Extract Bien so
 
 biensoxe = roi.copy()

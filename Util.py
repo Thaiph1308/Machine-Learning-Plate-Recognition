@@ -2,6 +2,7 @@ import os
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
+from keras.preprocessing.image import img_to_array, load_img
 
 def sub_plot(characters,row,column):
     plt.subplots(figsize=(10,10))
@@ -51,11 +52,11 @@ def draw_contour(image, c, i):
 	# draw the countour number on the image
 	cv2.putText(image, "#{}".format(i + 1), (cX - 20, cY), cv2.FONT_HERSHEY_SIMPLEX,
 		1.0, (255, 255, 255), 2)
- 
+
 	# return the image with the contour number drawn on it
 	return image
 
-def extract_cont_row(contours):
+def extract_cont_row(contours,return_bounding_boxes=False):
 	h1 =[]
 	h2 =[]
 	(cnts, boundingBoxes) = sort_contours(contours,method='top-to-bottom')
@@ -65,4 +66,37 @@ def extract_cont_row(contours):
 			h1.append(cnts[i])
 		else:
 			h2.append(cnts[i])
-	return h1+h2
+	(h1,h1_boudingboxes) = sort_contours(h1)
+	(h2,h2_boudingboxes) = sort_contours(h2)
+	if return_bounding_boxes == False:
+		return (h1+h2)
+	else:
+		return (h1+h2,h1_boudingboxes+h2_boudingboxes)
+
+def image_reshape(image,img_height=28,img_width=28):
+	im=cv2.imread(image)
+	im=cv2.resize(im,(img_height,img_width))
+	im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+	print(np.shape(im))
+	arr = np.reshape(im,(img_height,img_width))
+	print(np.shape(arr))
+	arr = np.expand_dims(arr,axis=0)
+	return arr
+
+def image_reshape_2(image,img_height=28,img_width=28):
+	im=cv2.resize(image,(img_height,img_width))
+	# cv2.imshow("asdf",im)
+	# cv2.waitKey()
+	arr = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+	# cv2.imshow("asdf",arr)
+	# cv2.waitKey()
+	print("Np shape grayscale: ",np.shape(arr))
+	#arr = np.reshape(im,(img_height,img_width))
+	print("NP shape after np reshape",np.shape(arr))
+	#print(arr)
+	arr = img_to_array(arr)
+	print("NP shape after img to array",np.shape(arr))
+	#arr = np.expand_dims(arr,axis=0)
+	#print("NP shape after expand_dims",np.shape(arr))
+	#print(arr)
+	return arr
