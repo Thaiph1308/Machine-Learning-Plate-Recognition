@@ -40,9 +40,9 @@ for i in new_conts:
     roi = cv2.resize(roi, (28, 28), interpolation=cv2.INTER_AREA)
     plt.imshow(roi)
     plt.show()
-    # roi = cv2.dilate(roi, (3, 3)) 
-    # plt.imshow(roi)
-    # plt.show()
+    roi = cv2.dilate(roi, (3, 3)) 
+    plt.imshow(roi)
+    plt.show()
     images.append(roi)
     # Calculate the HOG features
     # Util.print_info(roi_hog_fd,'true')
