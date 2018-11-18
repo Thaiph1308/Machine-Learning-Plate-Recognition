@@ -91,9 +91,12 @@ z=np.expand_dims(Character_images,axis=3)
 y=model.predict(z)
 #y=model.predict(Character_images)
 y_true = np.argmax(y,axis=1)
+y_str= "".join(str(x) for x in y_true)
 print(y)
 print(y_true)
-
+print(y_str)
+with open("output.txt","w") as text_file:
+        text_file.write(y_str)
 #Util.sub_plot(images,10,1)
 # print(np.shape(Util.image_reshape("digit.jpg")))
 # print(model.predict)
