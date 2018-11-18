@@ -23,56 +23,59 @@ model = load_model("CNN2.h5")
 #     return model
 
 def get_model_info(model):
-    model.summary()
-    for layer in model.layers:
-        print(layer.get_input_at(0).get_shape().as_list())
+        model.summary()
+        for layer in model.layers:
+                print(layer.get_input_at(0).get_shape().as_list())
 
 def predict(image):
-    return np.argmax(model.predict(image),axis=1)
+        return np.argmax(model.predict(image),axis=1)
 
 def extract_contour(image):
-    image = cv2.imread(image)
-    im_gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
-    im_blur = cv2.GaussianBlur(im_gray,(5,5),0)
-    im,thre = cv2.threshold(im_blur,90,255,cv2.THRESH_BINARY_INV)
-    _,contours,hierachy = cv2.findContours(thre,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-    rects = [cv2.boundingRect(cnt) for cnt in contours]
-    cont_sort_area=sorted(contours,key=lambda x: cv2.contourArea(x),reverse=True)[2:10]
-    (new_conts,BoudingBoxes)=Util.extract_cont_row(cont_sort_area,True)
-    #print(new_conts)
-    return (image,new_conts,BoudingBoxes)
+        image = cv2.imread(image)
+        im_gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+        im_blur = cv2.GaussianBlur(im_gray,(5,5),0)
+        im,thre = cv2.threshold(im_blur,90,255,cv2.THRESH_BINARY_INV)
+        _,contours,hierachy = cv2.findContours(thre,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+        rects = [cv2.boundingRect(cnt) for cnt in contours]
+        cont_sort_area=sorted(contours,key=lambda x: cv2.contourArea(x),reverse=True)[2:10]
+        (new_conts,BoudingBoxes)=Util.extract_cont_row(cont_sort_area,True)
+        #print(new_conts)
+        return (image,new_conts,BoudingBoxes)
 
 def full_predict(imagepath):
-    (image,conts,BoudingBoxes) = extract_contour(imagepath)
-    Character=[]
-    for i,box in enumerate(BoudingBoxes):
-        (x,y,w,h) = box
-        Util.print_info(image)
-        img = image[y:y+h,x:x+w]
-        im_gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-        im_blur = cv2.GaussianBlur(im_gray,(5,5),0)
-        (thresh, im_bw) = cv2.threshold(im_blur, 128, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
-        im_bw=np.pad(im_bw,(20,20),'constant',constant_values=(0,0)) 
-        img_blur_resize=cv2.resize(im_bw,(28,28),interpolation=cv2.INTER_AREA)        
-        # plt.imshow(img_blur_resize)
-        # plt.show()      
-        cv2.imwrite("c.jpg",img_blur_resize)
-        # plt.imshow(img)
-        # plt.show()
-        Character.append(img_blur_resize)
-    #print(Character)
-    return Character
+        (image,conts,BoudingBoxes) = extract_contour(imagepath)
+        # plt.imshow(image)
+        # plt.show() 
+        Util.print_info(BoudingBoxes)
+        Character=[]
+        for i,box in enumerate(BoudingBoxes):
+                (x,y,w,h) = box
+                #Util.print_info(image)
+                img = image[y:y+h,x:x+w]
+                im_gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+                im_blur = cv2.GaussianBlur(im_gray,(5,5),0)
+                (thresh, im_bw) = cv2.threshold(im_blur, 128, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+                im_bw=np.pad(im_bw,(20,20),'constant',constant_values=(0,0)) 
+                img_blur_resize=cv2.resize(im_bw,(28,28),interpolation=cv2.INTER_AREA)        
+                # plt.imshow(img_blur_resize)
+                # plt.show()      
+                cv2.imwrite("c.jpg",img_blur_resize)
+                # # plt.imshow(img)
+                # # plt.show()
+                Character.append(img_blur_resize)
+                #print(Character)
+        return Character
 #mlp_image = imread('c.jpg')
-cv_image=cv2.imread('c.jpg')
-plt.imshow(cv_image)
-plt.show()
-Character_images = full_predict("testsvm.jpg")
+# cv_image=cv2.imread('c.jpg')
+# plt.imshow(cv_image)
+# plt.show()
+Character_images = full_predict("test.jpg")
 # image: list of character
 #Util.print_info(images[0])
 #Util.print_info(np.asarray(images))
 Util.print_info(Character_images)
 #Util.sub_plot(images,10,1)
-img = image.load_img(path="c.jpg",grayscale=True,target_size=(28,28,1))
+img = image.load_img(path="test.jpg",grayscale=True,target_size=(28,28,1))
 img = image.img_to_array(img)
 # List_of_images = []
 # for image in Character_images:
@@ -90,7 +93,7 @@ y=model.predict(z)
 y_true = np.argmax(y,axis=1)
 print(y)
 print(y_true)
- 
+
 #Util.sub_plot(images,10,1)
 # print(np.shape(Util.image_reshape("digit.jpg")))
 # print(model.predict)
