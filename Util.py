@@ -102,3 +102,19 @@ def image_reshape_2(image,img_height=28,img_width=28):
 	#print("NP shape after expand_dims",np.shape(arr))
 	#print(arr)
 	return arr
+def serch_number_bouding_rect(contours):
+    rects = [cv2.boundingRect(cnt) for cnt in contours]
+    rects = sorted(rects,key=lambda x: (x[3]*x[2]), reverse=True)
+    #print(contours[1][2])
+    print("Rects: ",rects)
+    #print(np.shape(rects))
+    temp_rects = rects.copy()
+    for i,rect in enumerate(rects):
+        #print("i",i)
+        #print(str(rect[3]/rect[2]) + "   " + str((rect[3]*rect[2])) + " ratio: " + str((rects[0][2]*rects[0][3])/(rect[3]*rect[2])))
+        print ("Cont: " + str(rect) + " " + str(rect[3]/rect[2] <= 2) + " " + str(rect[3]/rect[2] >= 3.5) + " " + str((rects[0][2]*rects[0][3])/(rect[3]*rect[2]) <= 7) + " " + str((rects[0][2]*rects[0][3])/(rect[3]*rect[2]) >=45 ))
+        if rect[3]/rect[2] <= 2 or rect[3]/rect[2] >= 3.5 or (rects[0][2]*rects[0][3])/(rect[3]*rect[2]) <= 7 or (rects[0][2]*rects[0][3])/(rect[3]*rect[2]) >=45:
+            temp_rects.remove(rect)
+            print("remove: " + str(rect) + " area: " + str((rect[3]*rect[2])))
+    print("Bouding rect: ", temp_rects)
+    return temp_rects

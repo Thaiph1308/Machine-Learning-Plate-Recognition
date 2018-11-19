@@ -38,23 +38,7 @@ def extract_contour(image):
         im_blur = cv2.GaussianBlur(im_gray,(5,5),0)
         im,thre = cv2.threshold(im_blur,90,255,cv2.THRESH_BINARY_INV)
         _,contours,hierachy = cv2.findContours(thre,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-        rects = [cv2.boundingRect(cnt) for cnt in contours]
-        rect_areas = []
-        Max_area = max([tup[2] for tup in rects])*max([tup[3] for tup in rects])
-        rect_areas.append(Max_area)
-        print("MAX RECT:",Max_area)
-        for i,rect in enumerate(rects):
-                if rect[3]/rect[2] >= 2 and rect[3]/rect[2] <= 3.5:
-                        area = rect[2]*rect[3]
-                        rect_areas.append(area)
-        sorted_areas = []
-        for i,area in enumerate(rect_areas):
-                if max(rect_areas)/area >= 7 and max(rect_areas)/area <= 45:
-                        sorted_areas.append(area)
-        
-        #print("Rect:" ,rects)
-        print("Rect area:", rect_areas)
-        print("Sorted",sorted_areas)
+        Util.serch_number_bouding_rect(contours)
         #sorteddata = sorted(zip(rects_area, contours), key=lambda x: x[0], reverse=True)
         cont_sort_area=sorted(contours,key=lambda x: cv2.contourArea(x),reverse=True)[1:10]
         (new_conts,BoudingBoxes)=Util.extract_cont_row(cont_sort_area,True)
