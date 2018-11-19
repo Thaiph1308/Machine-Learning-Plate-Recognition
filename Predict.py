@@ -15,7 +15,7 @@ im,thre = cv2.threshold(im_blur,90,255,cv2.THRESH_BINARY_INV)
 _,contours,hierachy = cv2.findContours(thre,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 rects = [cv2.boundingRect(cnt) for cnt in contours]
 
-cont_sort_area=sorted(contours,key=lambda x: cv2.contourArea(x),reverse=True)[1:11]
+cont_sort_area=sorted(contours,key=lambda x: cv2.contourArea(x),reverse=True)[1:]
 # (sort_cont,boundingBoxes) = Util.sort_contours(s)
 # z= [cv2.boundingRect(c) for c in contours]
 # x= [cv2.boundingRect(c) for c in s]

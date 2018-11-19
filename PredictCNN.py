@@ -19,7 +19,7 @@ img_width = 28
 img_height = 28
 
 #model = load_model("E:\\IoTProject\\Machine-Learning-Plate-Recognition\\CNN2.h5") 
-model = load_model("CNN.h5")
+model = load_model("CNN2.h5")
 # def init_cnn_with_weight(weightpath):
 #     model=load_model("CNN.h5")
 #     return model
@@ -39,17 +39,39 @@ def extract_contour(image):
         im,thre = cv2.threshold(im_blur,90,255,cv2.THRESH_BINARY_INV)
         _,contours,hierachy = cv2.findContours(thre,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
         rects = [cv2.boundingRect(cnt) for cnt in contours]
-        cont_sort_area=sorted(contours,key=lambda x: cv2.contourArea(x),reverse=True)[2:10]
+        rect_areas = []
+        Max_area = max([tup[2] for tup in rects])*max([tup[3] for tup in rects])
+        rect_areas.append(Max_area)
+        print("MAX RECT:",Max_area)
+        for i,rect in enumerate(rects):
+                if rect[3]/rect[2] >= 2 and rect[3]/rect[2] <= 3.5:
+                        area = rect[2]*rect[3]
+                        rect_areas.append(area)
+        sorted_areas = []
+        for i,area in enumerate(rect_areas):
+                if max(rect_areas)/area >= 7 and max(rect_areas)/area <= 45:
+                        sorted_areas.append(area)
+        
+        #print("Rect:" ,rects)
+        print("Rect area:", rect_areas)
+        print("Sorted",sorted_areas)
+        #sorteddata = sorted(zip(rects_area, contours), key=lambda x: x[0], reverse=True)
+        cont_sort_area=sorted(contours,key=lambda x: cv2.contourArea(x),reverse=True)[1:10]
         (new_conts,BoudingBoxes)=Util.extract_cont_row(cont_sort_area,True)
         #print(new_conts)
         return (image,new_conts,BoudingBoxes)
 
 def full_predict(imagepath):
         (image,conts,BoudingBoxes) = extract_contour(imagepath)
+        cv2.drawContours(image, conts, -1, (0, 255, 0), 3)
+        plt.imshow(image)
+        plt.show()
         Character=[]
+        Areas = []
         for i,box in enumerate(BoudingBoxes):
                 (x,y,w,h) = box
                 #Util.print_info(image)
+                Areas.append(w*h)
                 img = image[y:y+h,x:x+w]
                 im_gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
                 im_blur = cv2.GaussianBlur(im_gray,(5,5),0)
@@ -63,13 +85,14 @@ def full_predict(imagepath):
                 # # plt.show()
                 Character.append(img_blur_resize)
                 #print(Character)
+        print(Areas)
         return Character
-Character_images = full_predict(Bsx.Extract_Plate("bxx","test.jpg"))    
+Character_images = full_predict(Bsx.Extract_Plate("bxx3.jpg","test.jpg"))    
 z=np.expand_dims(Character_images,axis=3)
 y=model.predict(z)
 y_true = np.argmax(y,axis=1)
 y_str= "".join(str(x) for x in y_true)        
-
+print(y_str)
 # def services():      
 #         path= "E:\\testIOT\\Server\\StoreImages"
 #         for i,filename in enumerate(os.listdir(path)):
