@@ -32,18 +32,21 @@ def get_model_info(model):
 def predict(image):
         return np.argmax(model.predict(image),axis=1)
 
-def extract_contour(image):
-        image = cv2.imread(image)
+def extract_contour(imagepath):
+        image = cv2.imread(imagepath)
         im_gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
         im_blur = cv2.GaussianBlur(im_gray,(5,5),0)
         im,thre = cv2.threshold(im_blur,90,255,cv2.THRESH_BINARY_INV)
         _,contours,hierachy = cv2.findContours(thre,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-        Util.serch_number_bouding_rect(contours)
-        #sorteddata = sorted(zip(rects_area, contours), key=lambda x: x[0], reverse=True)
-        cont_sort_area=sorted(contours,key=lambda x: cv2.contourArea(x),reverse=True)[1:10]
-        (new_conts,BoudingBoxes)=Util.extract_cont_row(cont_sort_area,True)
+        Number_Bouding_Rect = Util.serch_number_bouding_rect(contours)
+        Number_Bouding_Rect_Sorted = Util.sort_boxes_to_2_row(Number_Bouding_Rect)
+        #Util.Draw_BoudingBoxes(imagepath,Number_Bouding_Rect_Sorted)
+        # Util.serch_number_bouding_rect(contours)
+        # #sorteddata = sorted(zip(rects_area, contours), key=lambda x: x[0], reverse=True)
+        # cont_sort_area=sorted(contours,key=lambda x: cv2.contourArea(x),reverse=True)[1:10]
+        # (new_conts,BoudingBoxes)=Util.extract_cont_row(cont_sort_area,True)
         #print(new_conts)
-        return (image,new_conts,BoudingBoxes)
+        return (image,contours,Number_Bouding_Rect_Sorted)
 
 def full_predict(imagepath):
         (image,conts,BoudingBoxes) = extract_contour(imagepath)
@@ -53,29 +56,33 @@ def full_predict(imagepath):
         Character=[]
         Areas = []
         for i,box in enumerate(BoudingBoxes):
-                (x,y,w,h) = box
-                #Util.print_info(image)
+                (x,y,w,h) = box                
                 Areas.append(w*h)
                 img = image[y:y+h,x:x+w]
                 im_gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
                 im_blur = cv2.GaussianBlur(im_gray,(5,5),0)
                 (thresh, im_bw) = cv2.threshold(im_blur, 128, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+                # plt.imshow(im_bw)
+                # plt.show()
                 im_bw=np.pad(im_bw,(20,20),'constant',constant_values=(0,0)) 
                 img_blur_resize=cv2.resize(im_bw,(28,28),interpolation=cv2.INTER_AREA)        
                 # plt.imshow(img_blur_resize)
                 # plt.show()      
                 cv2.imwrite("c.jpg",img_blur_resize)
-                # # plt.imshow(img)
-                # # plt.show()
+                plt.imshow(im_bw)
+                plt.show()
+                plt.imshow(img_blur_resize)
+                plt.show()
                 Character.append(img_blur_resize)
                 #print(Character)
         print(Areas)
         return Character
-Character_images = full_predict(Bsx.Extract_Plate("bxx3.jpg","test.jpg"))    
+Character_images = full_predict(Bsx.Extract_Plate("bxx4.jpg","test.jpg"))    
 z=np.expand_dims(Character_images,axis=3)
 y=model.predict(z)
 y_true = np.argmax(y,axis=1)
-y_str= "".join(str(x) for x in y_true)        
+y_str= "".join(str(x) for x in y_true)      
+print(y)  
 print(y_str)
 # def services():      
 #         path= "E:\\testIOT\\Server\\StoreImages"
