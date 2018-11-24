@@ -1,6 +1,11 @@
 import numpy as np
 import cv2
 import Util
+import argparse
+from PIL import Image
+import pytesseract
+pytesseract.pytesseract.tesseract_cmd = 'C:\Program Files (x86)\Tesseract-OCR\\tesseract.exe'
+
 #contours=[(212, 169, 1, 1), (220, 163, 16, 7), (49, 103, 28, 65), (93, 101, 27, 65), (136, 100, 27, 65), (179, 97, 28, 66), (0, 65, 21, 143), (117, 55, 16, 10), (48, 29, 27, 64), (83, 28, 20, 63), (228, 27, 1, 3), (143, 25, 26, 64), (175, 24, 28, 64), (23, 23, 2, 1), (223, 17, 5, 4), (16, 0, 253, 208)]
 
 image = cv2.imread("test.jpg")
@@ -50,9 +55,14 @@ def Draw_BoudingBoxes(image,BoundingBoxes):
         cv2.rectangle(image,(x,y),(x+w,y+h),(0,255,0),1)
         cv2.imshow("ASDF",image)
         cv2.waitKey()
-    
-Boxes = serch_number_bouding_rect(contours)
-Boxes=sort_boxes_to_2_row(Boxes)
-Draw_BoudingBoxes("test.jpg",[(255, 79, 29, 103)])
-print("BOXES: ",Boxes)
+
+#print(pytesseract.image_to_string(cv2.imread('test-european.jpg'), lang='eng'))
+print("string: ",pytesseract.image_to_string(cv2.imread('digit.jpg'), lang='eng'))
+
+#print(pytesseract.image_to_osd(Image.open('test.jpg')))
+print(pytesseract.image_to_data(cv2.imread('test.jpg')))
+# Boxes = serch_number_bouding_rect(contours)
+# Boxes=sort_boxes_to_2_row(Boxes)
+# Draw_BoudingBoxes("test.jpg",[(255, 79, 29, 103)])
+# print("BOXES: ",Boxes)
 #print(serch_number_bouding_rect(contours))

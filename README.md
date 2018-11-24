@@ -1,1 +1,0 @@
-# Machine Learning Plate Recognition
