@@ -18,8 +18,8 @@ import os
 img_width = 28
 img_height = 28
 
-#model = load_model("E:\\IoTProject\\Machine-Learning-Plate-Recognition\\CNN2.h5") 
-model = load_model("CNN2.h5")
+model = load_model("E:\\IoTProject\\Machine-Learning-Plate-Recognition\\CNN2.h5") 
+#model = load_model("CNN2.h5")
 # def init_cnn_with_weight(weightpath):
 #     model=load_model("CNN.h5")
 #     return model
@@ -51,8 +51,8 @@ def extract_contour(imagepath):
 def full_predict(imagepath):
         (image,conts,BoudingBoxes) = extract_contour(imagepath)
         cv2.drawContours(image, conts, -1, (0, 255, 0), 3)
-        plt.imshow(image)
-        plt.show()
+        #plt.imshow(image)
+        #plt.show()
         Character=[]
         Areas = []
         for i,box in enumerate(BoudingBoxes):
@@ -69,35 +69,37 @@ def full_predict(imagepath):
                 # plt.imshow(img_blur_resize)
                 # plt.show()      
                 cv2.imwrite("c.jpg",img_blur_resize)
-                plt.imshow(im_bw)
-                plt.show()
-                plt.imshow(img_blur_resize)
-                plt.show()
+                #plt.imshow(im_bw)
+                #plt.show()
+                #plt.imshow(img_blur_resize)
+                #plt.show()
                 Character.append(img_blur_resize)
                 #print(Character)
         print(Areas)
         return Character
-Character_images = full_predict(Bsx.Extract_Plate("bxx4.jpg","test.jpg"))    
-z=np.expand_dims(Character_images,axis=3)
-y=model.predict(z)
-y_true = np.argmax(y,axis=1)
-y_str= "".join(str(x) for x in y_true)      
-print(y)  
-print(y_str)
-# def services():      
-#         path= "E:\\testIOT\\Server\\StoreImages"
-#         for i,filename in enumerate(os.listdir(path)):
-#                 print(filename)
-#                 Character_images = full_predict(Bsx.Extract_Plate("E:\\testIOT\\Server\\StoreImages\\"+ filename,"test.jpg"))    
-#                 z=np.expand_dims(Character_images,axis=3)
-#                 y=model.predict(z)
-#                 y_true = np.argmax(y,axis=1)
-#                 y_str= "".join(str(x) for x in y_true)
-#                 print(y_str)
-#                 with open("E:\\testIOT\\Server\\StoreTxt\\%d.txt" %(i+1),"w") as text_file:
-#                         text_file.write(y_str)
-#                 os.remove("E:\\testIOT\\Server\\StoreImages\\"+ filename)
+# Character_images = full_predict(Bsx.Extract_Plate("bxx4.jpg","test.jpg"))    
+# z=np.expand_dims(Character_images,axis=3)
+# y=model.predict(z)
+# y_true = np.argmax(y,axis=1)
+# y_str= "".join(str(x) for x in y_true)      
+# print(y)  
+# print(y_str)
+def services():      
+        path= "E:\\testIOT\\Server\\StoreImages"
+        for i,filename in enumerate(os.listdir(path)):
+                print(filename)
+                Character_images = full_predict(Bsx.Extract_Plate("E:\\testIOT\\Server\\StoreImages\\"+ filename,"test.jpg"))    
+                z=np.expand_dims(Character_images,axis=3)
+                y=model.predict(z)
+                y_true = np.argmax(y,axis=1)
+                y_str= "".join(str(x) for x in y_true)
+                print(y_str)
+                
+                with open("E:\\testIOT\\Server\\StoreTxt\\%s.txt" %filename,"w") as text_file:
+                        text_file.write(y_str)
+                os.remove("E:\\testIOT\\Server\\StoreImages\\"+ filename)
 
+services()
 
 #Character_images = full_predict(Bsx.Extract_Plate("E:\\testIOT\\Server\\StoreImages\\bxx.jpg","test.jpg"))
 #Util.sub_plot(Character_images,5,2)
